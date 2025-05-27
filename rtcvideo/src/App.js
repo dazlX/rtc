@@ -17,12 +17,11 @@ export const App = () => {
   })
   
   return (
-    <div style={{ fontFamily: 'Arial', margin: '20px' }}>
+    <div>
       <video 
         ref={videoRef} 
         controls 
         autoPlay 
-        style={{ background: '#000', width: '800px' }}
       />
     </div>
   );
