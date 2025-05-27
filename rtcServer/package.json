@@ -1,13 +1,14 @@
 {
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^5.1.0",
+    "hls.js": "^1.6.2",
     "ws": "^8.18.2"
   },
   "name": "rtcserver",
   "version": "1.0.0",
   "main": "App.js",
   "type": "module",
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

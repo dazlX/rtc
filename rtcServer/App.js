@@ -1,49 +1,68 @@
 import express from "express"
-import {WebSocketServer} from "ws"
+import fs from "fs"
 import {spawn} from "child_process"
+import path from "path"
+import { fileURLToPath } from 'url';
 
-const app = new express()
-const PORT = 3001
+const app = express()
 
-const wss = new WebSocketServer({ port: 4044 });
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-wss.on('connection', (ws) => 
-    {
-    console.log(1)
+const ffmeg = spawn("ffmpeg", [
+  '-i', 'rtsp://rtspstream:B9NznuFEYqVpm3PFiygCM@zephyr.rtsp.stream/pattern',
+  '-c:v', 'libx264',
+  '-c:a', 'aac',
+  '-f', 'hls',
+  '-hls_time', '2',
+  '-hls_list_size', '5',
+  '-hls_flags', 'delete_segments',
+  '-hls_segment_filename', 'stream/stream_%03d.ts',
+  'stream/stream.m3u8'
+])
 
-const rtspUrl = "https://rtsp.cam/php/iframe.php?devcode=0b30b1c3ec8544c4bdc77b2c123579b0"
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  next();
+});
 
-const ffmpegP = [
-    '-i', rtspUrl,
-    '-c:v', 'libx264',
-    '-preset', 'ultrafast',
-    '-tune', 'zerolatency',
-    '-f', 'mp4',
-    '-movflags', 'frag_keyframe+empty_moov',
-    '-reset_timestamps', '1',
-    '-loglevel', 'error',
-    '-'
-  ];
+app.use('/stream', express.static('stream'));
 
-const ffmpeg = spawn('ffmpeg', ffmpegP)
-
-ffmpeg.stdout.on('data', (data) =>
-    {
-        if(wss.readyState === ws.OPEN)
-        {
-            ws.send(data)
+app.get('/stream.m3u8', (req,res) => {
+    const filePath = path.join(__dirname, 'stream', 'stream.m3u8')
+    fs.readFile(filePath, (err, data) => {
+        if(err){
+            console.log(err)
+            res.status(404).json({
+                message: "Файл не найден"
+            })
         }
-    }
-)
-ws.on("close", () => {
-    ffmpeg.kill()
-    console.log(2)
-})
-    }
-)
-
-
-app.listen(PORT, () => 
-    {
-        console.log(`SERVER OK ${PORT}`)
+        res.status(200).end(data)
     })
+})
+
+app.get('/:ts', (req,res) => {
+    const tsName = req.params.ts
+
+    const filePath = path.join(__dirname, 'stream', tsName)
+
+    fs.readFile(filePath, (err,data) => {
+        if(err) {
+            console.log(err)
+            res.status(500).json({
+                message: err
+            })
+        }
+        res.status(200).end(data)
+    })
+
+})
+
+
+
+const PORT = 3001
+app.listen(PORT, (err) => {
+    if(err){console.log(err)}
+    console.log("SERVER OK")
+})
+
