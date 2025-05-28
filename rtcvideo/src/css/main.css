@@ -1,0 +1,10 @@
+.rtcVideo {
+    padding: 30px;
+    width: 600px;
+    height: 300px;
+}
+.main {
+  width: 100%; 
+  display: flex;
+  justify-content: center; 
+}
