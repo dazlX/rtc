@@ -10,6 +10,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const ffmeg = spawn("ffmpeg", [
+  '-rtsp_transport', 'tcp',
   '-i', 'rtsp://rtspstream:B9NznuFEYqVpm3PFiygCM@zephyr.rtsp.stream/pattern',
   '-c:v', 'libx264',
   '-c:a', 'aac',
@@ -21,10 +22,18 @@ const ffmeg = spawn("ffmpeg", [
   'stream/stream.m3u8'
 ])
 
+ffmeg.stderr.on('data', (data) => {
+    console.log(data.toString())
+})
+
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   next();
 });
+
+app.get('/', (req,res) => {
+    res.status(200)
+})
 
 app.use('/stream', express.static('stream'));
 
@@ -37,6 +46,7 @@ app.get('/stream.m3u8', (req,res) => {
                 message: "Файл не найден"
             })
         }
+
         res.status(200).end(data)
     })
 })
