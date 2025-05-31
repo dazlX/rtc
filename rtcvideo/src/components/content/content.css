@@ -1,0 +1,35 @@
+.main {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+}
+
+.tabl {
+    border: 2px solid #333;
+}
+.tabl th, .tabl td {
+    border: 2px solid #333;
+    text-align: center;
+}
+.nameCam {
+    width: 250px;
+}
+
+.location {
+    width: 350px;
+}
+
+.latitude {
+    width: 130px;
+}
+
+.longitude {
+    width: 130px;
+}
+
+.click {
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
+    width: 100px;
+}
