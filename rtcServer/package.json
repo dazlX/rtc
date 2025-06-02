@@ -3,6 +3,8 @@
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "hls.js": "^1.6.2",
+    "pg": "^8.16.0",
+    "serve-favicon": "^2.5.0",
     "ws": "^8.18.2"
   },
   "name": "rtcserver",

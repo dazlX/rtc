@@ -3,8 +3,10 @@ import fs from "fs"
 import {spawn} from "child_process"
 import path from "path"
 import { fileURLToPath } from 'url';
+import { pool } from "./db.js";
 
 const app = express()
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -33,6 +35,7 @@ app.use((req, res, next) => {
 
 app.get('/', (req,res) => {
     res.status(200)
+    res.send('<h1>тест</h1>')
 })
 
 app.use('/stream', express.static('stream'));
@@ -51,24 +54,44 @@ app.get('/stream.m3u8', (req,res) => {
     })
 })
 
-app.get('/:ts', (req,res) => {
-    const tsName = req.params.ts
+// app.get('/:ts', (req,res) => {
+//     const tsName = req.params.ts
 
-    const filePath = path.join(__dirname, 'stream', tsName)
+//     const filePath = path.join(__dirname, 'stream', tsName)
 
-    fs.readFile(filePath, (err,data) => {
-        if(err) {
-            console.log(err)
-            res.status(500).json({
-                message: err
-            })
-        }
-        res.status(200).end(data)
-    })
+//     fs.readFile(filePath, (err,data) => {
+//         if(err) {
+//             console.log(err)
+//             res.status(500).json({
+//                 message: err
+//             })
+//         }
+//         res.status(200).end(data)
+//     })
+
+// })
+
+app.get('/id/:id', async (req, res) => {
+    const params = req.params.id
+
+    try{
+        const query = await pool.query(`SELECT camid FROM cam WHERE id = ${params}`)
+        res.status(200).send(query)
+    }
+    catch(err){
+        console.log(err)
+        res.status(500).json({
+            message: error
+        })
+    }
 
 })
 
-
+app.get('/test', async (req, res) => {
+    const query = await pool.query('SELECT * FROM cam')
+    console.log(query.rows[1].location)
+    res.status(200).send(query)
+})
 
 const PORT = 3001
 app.listen(PORT, (err) => {

@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 export function Content({ nameCam, location, latitude, longitude, camId }) {
     const nav = useNavigate()
     return (
-        <div className="main">
+
             <table className='tabl'>
                 <tbody>
                     <tr>
@@ -17,6 +17,6 @@ export function Content({ nameCam, location, latitude, longitude, camId }) {
                     </tr>
                 </tbody>
             </table>
-        </div>
+
     );
 }
