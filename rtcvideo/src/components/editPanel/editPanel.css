@@ -1,0 +1,39 @@
+.editPanel {
+    display: flex;
+    flex-direction: column;
+    margin-top: 200px;
+    width: 100%;
+    align-items: center;
+}
+
+.btnEdit {
+    background-color: rgb(81, 233, 162);
+    border-width: 0px;
+    cursor: pointer;
+    color: white;
+    height: 25px;
+    width: 100px;
+    margin-right: 10px;
+}
+
+input {
+    width: 400px;
+    height: 25px;
+}
+
+.btnDel {
+    background-color: rgb(235, 80, 41);
+    border-width: 0px;
+    color: white;
+    height: 25px;
+    width: 100px;
+    cursor: pointer;
+}
+
+.btnDel:hover {
+    background-color: rgb(172, 28, 28);
+}
+
+.btnEdit:hover {
+    background-color: rgb(28, 148, 98);
+}

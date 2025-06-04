@@ -14,6 +14,7 @@ export function Content({ nameCam, location, latitude, longitude, camId }) {
                         <td className='latitude'>{latitude}</td>
                         <td className='longitude'>{longitude}</td>
                         <td className='click' onClick={() => nav(`/hls/${camId}`)}>Смотреть</td>
+                        <td className='edit' onClick={() => nav(`/editor/${camId}`)}>✏</td>
                     </tr>
                 </tbody>
             </table>

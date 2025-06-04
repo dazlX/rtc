@@ -80,7 +80,7 @@ app.get('/id/:id', async (req, res) => {
     const params = req.params.id
 
     try{
-        const query = await pool.query(`SELECT camid FROM cam WHERE id = ${params}`)
+        const query = await pool.query(`SELECT camid FROM cam WHERE id = $1`, [params])
         res.status(200).send(query)
     }
     catch(err){
@@ -103,7 +103,7 @@ app.post('/add', async (req, res) => {
     console.log(data)
     try {
         if(!data) throw new Error("Данных нету")
-        await pool.query(`INSERT INTO cam(namecam, location, latitude, longitude, camId) VALUES ($1,$2,$3,$4,$5)`, [data.nameCam, data.location, data.latitude, data.longitude, data.camAddres])
+        await pool.query(`INSERT INTO cam(namecam, location, latitude, longitude, camId) VALUES ($1,$2,$3,$4,$5)`, [data.nameCam, data.location, data.latitude, data.longitude, data.camAddress])
         res.status(200).json({
         success: true
     })
@@ -112,6 +112,58 @@ app.post('/add', async (req, res) => {
         console.log(err)
         res.status(500).json({
             message: err
+        })
+    }
+})
+
+app.get('/getFullInfo/:id', async (req,res) => {
+    const id = req.params.id
+    
+    try {
+        const query = await pool.query('SELECT * FROM cam WHERE id = $1', [id])
+        res.status(200).send(query)
+    }
+    catch(err) {
+        console.log(err)
+        res.status(500).json({
+            success: false,
+            message: err
+        })
+    }
+})
+
+app.delete("/delete/:id", async (req, res) => {
+        const id = req.params.id
+    try{
+        await pool.query('DELETE FROM cam WHERE id = $1', [id])
+        res.status(200).json({
+            success: true
+        })
+    }
+    catch(err) {
+        console.log(err)
+        res.status(500).json({
+            success: false
+        })
+    }
+})
+
+app.patch('/update/:id', async   (req, res) => {
+    const id = req.params.id
+    const data = req.body
+    // console.log(req.body)
+    console.log(data)
+    try{
+        await pool.query('UPDATE cam SET namecam = $1, location = $2, latitude = $3, longitude = $4, camid = $5 WHERE id = $6' , [data.nameCam, data.location, data.latitude, data.longitude, data.camAddress, id])
+        res.status(200).json({
+            success: true
+        })
+    }
+    catch(err){
+        console.log(data)
+        console.log(err)
+        res.status(500).json({
+            success: false
         })
     }
 })
