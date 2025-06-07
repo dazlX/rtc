@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import './editPanel.css'
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
@@ -18,7 +18,7 @@ export function EditPanel() {
     useEffect(() => {
         console.log(camId.id)
         const getInfo = async () => {
-            const res = await axios.get(`http://localhost:3001/getFullInfo/${camId.id}`) 
+            const res = await axios.get(`http://localhost:3001/camera/${camId.id}`) 
             const query = res.data.rows
             console.log(query)
             setData(query)
@@ -54,14 +54,14 @@ export function EditPanel() {
         
         console.log(inputRef.current.value)
 
-        await axios.patch(`http://localhost:3001/update/${camId.id}`, editInfo).then(res => {
+        await axios.patch(`http://localhost:3001/camera/${camId.id}`, editInfo).then(res => {
             if(res.status == 200) nav('/')
         })
     }
 
     const del = async () => {
         try{
-            await axios.delete(`http://localhost:3001/delete/${camId.id}`).then(res => {
+            await axios.delete(`http://localhost:3001/camera/${camId.id}`).then(res => {
                 if(res.status == 200) nav('/')
                 
             })
@@ -71,16 +71,18 @@ export function EditPanel() {
         }
     }
     return(
+        <div className="editPanelBody">
+            
         <div className="editPanel">
             <input name="nameCam" ref={inputRef}/>
             <input name="location" ref={inputRef1}/>
             <input name="latitude" ref={inputRef2}/>
             <input name="longitude" ref={inputRef3}/>
             <input name="camAddress" ref={inputRef4}/>
-            <div className="btnCont">
-                <button className="btnEdit" onClick={edit}>Сохранить</button>
-                <button className="btnDel" onClick={del}>Удалить</button>
-            </div>
+            <button className="btnEdit" onClick={edit}>Сохранить</button>
+            <button className="btnDel" onClick={del}>Удалить</button>
+            <button className="btnExit" onClick={() => {nav('/')}}>Отмена</button>
+        </div>
         </div>
     )
 }

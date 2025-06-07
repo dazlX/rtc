@@ -1,0 +1,45 @@
+.boxInput {
+    border-width: 1px;
+    width: auto;
+    display: flex;
+    height: auto;
+    flex-direction: column;
+    margin-top: 200px;
+
+    input{
+    height: 25px;
+    margin-bottom: 5px;
+    }
+    
+   
+}
+
+ .btnOk{
+    background-color: rgb(32, 214, 123);
+    color: white;
+    height: 25px;
+    border-width: 0px;
+    cursor: pointer;
+    margin-bottom: 5px;
+}
+
+.btnOk:hover {
+    background-color: rgb(24, 161, 93);
+}
+
+.btnExit {
+    background-color: rgb(245, 24, 24);
+    height: 25px;
+    border-width: 0px;
+    color:white
+}
+
+.btnExit:hover {
+    background-color: rgb(138, 14, 14);
+}
+
+.AddCamPage {
+    width: 100%;
+    justify-content: center;
+    display: flex;
+}

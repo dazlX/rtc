@@ -92,13 +92,12 @@ app.get('/id/:id', async (req, res) => {
 
 })
 
-app.get('/test', async (req, res) => {
+app.get('/camera/list', async (req, res) => {
     const query = await pool.query('SELECT * FROM cam')
-    console.log(query.rows[1].location)
     res.status(200).send(query)
 })
 
-app.post('/add', async (req, res) => {
+app.post('/camera/add', async (req, res) => {
     const {data} = req.body
     console.log(data)
     try {
@@ -116,7 +115,7 @@ app.post('/add', async (req, res) => {
     }
 })
 
-app.get('/getFullInfo/:id', async (req,res) => {
+app.get('/camera/:id', async (req,res) => {
     const id = req.params.id
     
     try {
@@ -132,7 +131,7 @@ app.get('/getFullInfo/:id', async (req,res) => {
     }
 })
 
-app.delete("/delete/:id", async (req, res) => {
+app.delete("/camera/:id", async (req, res) => {
         const id = req.params.id
     try{
         await pool.query('DELETE FROM cam WHERE id = $1', [id])
@@ -148,7 +147,7 @@ app.delete("/delete/:id", async (req, res) => {
     }
 })
 
-app.patch('/update/:id', async   (req, res) => {
+app.patch('/camera/:id', async   (req, res) => {
     const id = req.params.id
     const data = req.body
     // console.log(req.body)
