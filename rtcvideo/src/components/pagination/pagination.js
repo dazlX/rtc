@@ -2,15 +2,16 @@ import { useEffect, useState } from "react"
 import { Content } from "../content/content.js"
 import './pagination.css'
 import axios from "axios"
+import { PageNum } from "./pageNum.js"
 
 export function Pagination(props) {
-    const [dataS, setDataS] = useState([])
-    const [active, setActive] = useState(1)
     const [filterData, setFilterData] = useState([])
     const [test, setTest] = useState([])
     const [dataElement, setDataElement] = useState()
     const [currentPage, setPage] = useState(1)
     const [searchItem, setSearchItem] = useState('')
+    const [info, setInfo] = useState([])
+
 
 
 
@@ -39,9 +40,7 @@ export function Pagination(props) {
         queryT()
     }, [currentPage])
 
-    useEffect(() => {
-        setDataS(test)
-    }, [test])
+
 
     const totalPage = Math.ceil(dataElement / pageElement)
 
@@ -66,10 +65,6 @@ export function Pagination(props) {
         pageNum.push(i)
     }
 
-    const setActiveButton = (i) => {
-        setActive(i)
-    }
-
     const filter = async (searchItem) => {
         try {
                 const queryFilter = await axios.get(`http://localhost:3001/camera/filter/${searchItem}`).then(res => {
@@ -90,6 +85,7 @@ export function Pagination(props) {
         }
     }, [searchItem])
 
+
     const result = () => {
         if(searchItem == ''){
             return(
@@ -106,8 +102,15 @@ export function Pagination(props) {
             )
         }
         else{
+            if(info.length == 0){
+                return(
+                    <div className="errMessageCont">
+                        <h1>Нет данных</h1>
+                    </div>
+                )
+            }
             return(
-                filterData.map((item) => (
+                info.map((item) => (
                     <Content
                         key={item.id}
                         nameCam={item.namecam}
@@ -121,6 +124,8 @@ export function Pagination(props) {
         }
     }
 
+
+
     return(
         <div className="body">
             <div className="searchInputBody">
@@ -129,12 +134,12 @@ export function Pagination(props) {
             <div className="main">
             {result()}
             </div>
-            <div className="btnPagination">
-                {pageNum.map(i => (<button key={i} className={active == i ? "btnPageActive":"btnPage"} onClick={() =>  {
-                    setPage(i)
-                    setActiveButton(i)
-                }}>{i}</button>))}
-            </div>
+            <PageNum
+                data ={filterData}
+                setPage = {setPage}
+                currentPage = {currentPage}
+                setInfo = {setInfo}
+            />
         </div>
       
         
