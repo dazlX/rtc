@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 export function MainPage() {
     const [info, setInfo] = useState([])
-    const [currentPage, setPage] = useState(1)
+    
     const nav = useNavigate()
     const [Error, setError] = useState(false)
     const [loading , serLoading] = useState(true)
@@ -30,7 +30,7 @@ export function MainPage() {
         serLoading(false)  
     }, [])
 
-    const paginate = (pageNumber) => {setPage(pageNumber)}
+    
  
     if(loading) {
         return(
@@ -51,10 +51,7 @@ export function MainPage() {
     return(
         <div>
             <div className="content">   
-                <Pagination 
-                    paginate={paginate}
-                    data={info}
-                    currentPage={currentPage}/>
+                <Pagination/>
             </div>
             <div className="addCamBtn">
                 <button onClick={() => {nav(`/addCam`)}}>Добавить камеру</button>

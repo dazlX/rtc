@@ -1,5 +1,5 @@
 import express from "express"
-import fs from "fs"
+import fs, { lstat } from "fs"
 import {spawn} from "child_process"
 import cors from 'cors'
 import path from "path"
@@ -43,6 +43,8 @@ app.get('/', (req,res) => {
     res.send('<h1>тест</h1>')
 })
 
+
+
 // app.use('/stream', express.static('stream'));
 
 // app.get('/stream.m3u8', (req,res) => {
@@ -81,7 +83,7 @@ app.get('/id/:id', async (req, res) => {
 
     try{
         const query = await pool.query(`SELECT camid FROM cam WHERE id = $1`, [params])
-        res.status(200).send(query)
+        res.status(200).send(query.rows)
     }
     catch(err){
         console.log(err)
@@ -94,7 +96,7 @@ app.get('/id/:id', async (req, res) => {
 
 app.get('/camera/list', async (req, res) => {
     const query = await pool.query('SELECT * FROM cam')
-    res.status(200).send(query)
+    res.status(200).send(query.rows)
 })
 
 app.post('/camera/add', async (req, res) => {
@@ -115,12 +117,58 @@ app.post('/camera/add', async (req, res) => {
     }
 })
 
+const dataF = await pool.query('SELECT * FROM cam')
+
+app.get('/camera/filter/:searchItem', async (req,res) => {
+    const searchItem = req.params.searchItem
+
+    try{
+        const Filter = searchItem ?
+            dataF.rows.filter(dataF => 
+            `${dataF.namecam} ${dataF.location} ${dataF.latitude} ${dataF.longitude}`.toLowerCase().includes(searchItem.toLowerCase())
+            )
+            :
+            dataF
+        res.status(200).json({
+            filter: Filter
+        })
+    }
+    catch(err){
+        console.log(err)
+        res.status(500).json({
+            success: false
+        })
+    }
+})
+
+
+
+app.get('/camera/pagination', async (req, res) => {
+    try{
+        const {firstElement, lastElement} = req.query
+
+        const allData = await pool.query('SELECT COUNT(*) FROM cam')
+        const query = await pool.query('SELECT * FROM cam WHERE id >= $1 and id <= $2', [firstElement, lastElement])       
+
+        res.status(200).json({
+            data: query.rows,
+            allData: allData.rows[0].count
+        })
+    }
+    catch(err) {
+        console.log(err)
+        res.status(500).json({
+            success: false
+        })
+    }
+})
+
 app.get('/camera/:id', async (req,res) => {
     const id = req.params.id
     
     try {
         const query = await pool.query('SELECT * FROM cam WHERE id = $1', [id])
-        res.status(200).send(query)
+        res.status(200).send(query.rows)
     }
     catch(err) {
         console.log(err)
