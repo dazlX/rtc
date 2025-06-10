@@ -7,63 +7,34 @@ import { PageNum } from "./pageNum.js"
 export function Pagination(props) {
     const [filterData, setFilterData] = useState([])
     const [test, setTest] = useState([])
-    const [dataElement, setDataElement] = useState()
+    const [data, setData] = useState([])
+    const [data1, setData1] = useState([])
+
+    const [dataElement, setDataElement] = useState([])
     const [currentPage, setPage] = useState(1)
     const [searchItem, setSearchItem] = useState('')
     const [info, setInfo] = useState([])
 
-
-
-
-
     
-    const pageElement = 6
-
-    const lastElement = currentPage * pageElement
-
-    const firstElement = lastElement - pageElement
- 
-     
     const queryT = async () => {
         try{
-            const query = await axios.get(`http://localhost:3001/camera/pagination?firstElement=${firstElement}&lastElement=${lastElement}`).then(res => {
+            const query = await axios.get(`http://localhost:3001/camera/pagAll`).then(res => {
                 setDataElement(res.data.allData)
-                setTest(res.data.data)
+                console.log(res.data.allData)
             })
         }
         catch (err){
-
+            console.log(err)
         }
     }
-
     useEffect(() => {
         queryT()
+        console.log(dataElement)
     }, [currentPage])
 
-
-
-    const totalPage = Math.ceil(dataElement / pageElement)
-
-    const pageNum = []
-
-    let firstPage, lastPage
-    
-    if(totalPage <= 5){
-        firstPage = 1
-        lastPage = totalPage
-    }
-    else{
-
-        if(currentPage <= 2){
-            firstPage = 1
-            lastPage = 4
-        }
-        
-    }
-
-    for(let i = firstPage; i <= lastPage; i++){
-        pageNum.push(i)
-    }
+    useEffect(() => {
+        console.log(dataElement)
+    }, [dataElement])
 
     const filter = async (searchItem) => {
         try {
@@ -77,17 +48,70 @@ export function Pagination(props) {
     }
 
     useEffect(() => {
-        if(searchItem == '') {
-            return
-        }
-        else {
-            filter(searchItem)
-        }
+        if(searchItem == '') return
+        filter(searchItem)
     }, [searchItem])
 
+    const pagiQ = async (info) => {
+        setTest(info)
+        try {
+            const firstElement = info.shift()
+            const lastElement = info.pop()
+            console.log(firstElement, lastElement)
+            console.log('asd')
+            if(firstElement === undefined || lastElement === undefined) return
+            await axios.get(`http://localhost:3001/camera/pagination?firstElement=${firstElement}&lastElement=${lastElement}`).then(res => {
+                setData(res.data.data)
+            })
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+       
+
+    useEffect(() => {
+            pagiQ(info)
+    },[info])
+
+    useEffect(() => {
+        console.log(data)
+    }, [data])
 
     const result = () => {
-        if(searchItem == ''){
+
+        if(searchItem == '') {
+            if(data.length == undefined) {
+                console.log(data1)
+                return(
+                    data1.map((item) => (
+                        <Content
+                            key={item.id}
+                            nameCam={item.namecam}
+                            location={item.location}
+                            latitude={item.latitude}
+                            longitude={item.longitude}
+                            camId={item.id}
+                            />
+                        )) 
+                )
+            }
+            return(
+                data ? data.map((item) => (
+                    <Content
+                        key={item.id}
+                        nameCam={item.namecam}
+                        location={item.location}
+                        latitude={item.latitude}
+                        longitude={item.longitude}
+                        camId={item.id}
+                        />
+                    )) 
+                : <h1>Ошибка</h1>
+            )
+        }
+        else {
+            console.log(filterData)
             return(
                 test.map((item) => (
                     <Content
@@ -97,34 +121,40 @@ export function Pagination(props) {
                         latitude={item.latitude}
                         longitude={item.longitude}
                         camId={item.id}
-                    />     
-                ))
-            )
-        }
-        else{
-            if(info.length == 0){
-                return(
-                    <div className="errMessageCont">
-                        <h1>Нет данных</h1>
-                    </div>
-                )
-            }
-            return(
-                info.map((item) => (
-                    <Content
-                        key={item.id}
-                        nameCam={item.namecam}
-                        location={item.location}
-                        latitude={item.latitude}
-                        longitude={item.longitude}
-                        camId={item.id}
-                    />     
-                ))
+                        />
+                    )) 
             )
         }
     }
 
 
+    const resultQ = () => {
+
+        if(searchItem == '') {
+            return(
+                <PageNum
+                data ={dataElement}
+                setTest ={setTest}
+                setPage = {setPage}
+                currentPage = {currentPage}
+                setInfo = {setInfo}
+            />
+            )
+        }
+        else {
+            console.log(filterData)
+            return(
+                <PageNum
+                    fd = {true}
+                    setTest ={setTest}
+                    data ={filterData}
+                    setPage = {setPage}
+                    currentPage = {currentPage}
+                    setInfo = {setInfo}
+                />
+            )
+        }
+    }
 
     return(
         <div className="body">
@@ -134,12 +164,7 @@ export function Pagination(props) {
             <div className="main">
             {result()}
             </div>
-            <PageNum
-                data ={filterData}
-                setPage = {setPage}
-                currentPage = {currentPage}
-                setInfo = {setInfo}
-            />
+            {resultQ()}
         </div>
       
         

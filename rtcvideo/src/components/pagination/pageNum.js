@@ -3,14 +3,16 @@ import { useState , useEffect} from "react"
 
 export function PageNum(props) {
     const currentPage = props.currentPage
-    //const totalPage = props.totalPage
     const setPage = props.setPage
     const data = props.data
     const setInfo = props.setInfo
+    const fd = props.fd
+    const setTest = props.setTest
+    console.log(fd)
     const [active, setActive] = useState(1)
     
     const pageElement = 6
-
+    
     const totalPage = Math.ceil(data.length / pageElement)
     
     const pageNum = []
@@ -38,6 +40,7 @@ export function PageNum(props) {
         setActive(i)
     }
 
+
     useEffect(() => {
 
         const lastElement = currentPage * pageElement
@@ -46,7 +49,7 @@ export function PageNum(props) {
 
         const info = data.slice(firstElement, lastElement)  
 
-        setInfo(info)
+        fd ? setInfo(info) : setTest(info)
 
     }, [currentPage, data])
     

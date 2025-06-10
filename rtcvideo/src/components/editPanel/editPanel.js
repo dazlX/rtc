@@ -19,8 +19,7 @@ export function EditPanel() {
         console.log(camId.id)
         const getInfo = async () => {
             const res = await axios.get(`http://localhost:3001/camera/${camId.id}`) 
-            const query = res.data.rows
-            console.log(query)
+            const query = res.data
             setData(query)
         }
 
