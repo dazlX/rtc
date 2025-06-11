@@ -2,171 +2,96 @@ import { useEffect, useState } from "react"
 import { Content } from "../content/content.js"
 import './pagination.css'
 import axios from "axios"
-import { PageNum } from "./pageNum.js"
+
 
 export function Pagination(props) {
-    const [filterData, setFilterData] = useState([])
-    const [test, setTest] = useState([])
     const [data, setData] = useState([])
-    const [data1, setData1] = useState([])
-
-    const [dataElement, setDataElement] = useState([])
-    const [currentPage, setPage] = useState(1)
+    const [loading, setLoading] = useState(false)
     const [searchItem, setSearchItem] = useState('')
-    const [info, setInfo] = useState([])
+    const [pagination, setPagination] = useState({
+        page: 1,
+        limit: 6,
+        totalItems: 0,
+        totalPage: 1
+    })
 
-    
-    const queryT = async () => {
+    const queryData = async () => {
         try{
-            const query = await axios.get(`http://localhost:3001/camera/pagAll`).then(res => {
-                setDataElement(res.data.allData)
-                console.log(res.data.allData)
-            })
-        }
-        catch (err){
-            console.log(err)
-        }
-    }
-    useEffect(() => {
-        queryT()
-        console.log(dataElement)
-    }, [currentPage])
+            setLoading(true)
 
-    useEffect(() => {
-        console.log(dataElement)
-    }, [dataElement])
-
-    const filter = async (searchItem) => {
-        try {
-                const queryFilter = await axios.get(`http://localhost:3001/camera/filter/${searchItem}`).then(res => {
-                setFilterData(res.data.filter)
-            })
-        }
-        catch (err) {
-            console.log(err)
-        }
-    }
-
-    useEffect(() => {
-        if(searchItem == '') return
-        filter(searchItem)
-    }, [searchItem])
-
-    const pagiQ = async (info) => {
-        setTest(info)
-        try {
-            const firstElement = info.shift()
-            const lastElement = info.pop()
-            console.log(firstElement, lastElement)
-            console.log('asd')
-            if(firstElement === undefined || lastElement === undefined) return
-            await axios.get(`http://localhost:3001/camera/pagination?firstElement=${firstElement}&lastElement=${lastElement}`).then(res => {
+            await axios.get('http://localhost:3001/camera/filtAndPag', {params: {
+                search: searchItem,
+                page: pagination.page,
+                limit: pagination.limit
+            }}).then(res => {
                 setData(res.data.data)
+                setPagination({
+                    ...pagination,
+                    totalItems: res.data.pagination.totalItems,
+                    totalPage: res.data.pagination.totalPage
+                })
             })
-        } catch (error) {
-            console.log(error)
+        } catch(err) {
+            console.log(err)
+        }
+        finally{
+            setLoading(false)
         }
     }
 
-       
+    useEffect(() => {
+        queryData()
+    }, [])
 
     useEffect(() => {
-            pagiQ(info)
-    },[info])
-
-    useEffect(() => {
-        console.log(data)
-    }, [data])
-
-    const result = () => {
-
-        if(searchItem == '') {
-            if(data.length == undefined) {
-                console.log(data1)
-                return(
-                    data1.map((item) => (
-                        <Content
-                            key={item.id}
-                            nameCam={item.namecam}
-                            location={item.location}
-                            latitude={item.latitude}
-                            longitude={item.longitude}
-                            camId={item.id}
-                            />
-                        )) 
-                )
-            }
-            return(
-                data ? data.map((item) => (
-                    <Content
-                        key={item.id}
-                        nameCam={item.namecam}
-                        location={item.location}
-                        latitude={item.latitude}
-                        longitude={item.longitude}
-                        camId={item.id}
-                        />
-                    )) 
-                : <h1>Ошибка</h1>
-            )
-        }
-        else {
-            console.log(filterData)
-            return(
-                test.map((item) => (
-                    <Content
-                        key={item.id}
-                        nameCam={item.namecam}
-                        location={item.location}
-                        latitude={item.latitude}
-                        longitude={item.longitude}
-                        camId={item.id}
-                        />
-                    )) 
-            )
-        }
+        queryData()
+    }, [searchItem, pagination.page, pagination.limit])
+    
+    const searchChange = (e) => {
+        setSearchItem(e.target.value)
+        setPagination({
+            ...pagination,
+            page: 1
+        })
     }
 
-
-    const resultQ = () => {
-
-        if(searchItem == '') {
-            return(
-                <PageNum
-                data ={dataElement}
-                setTest ={setTest}
-                setPage = {setPage}
-                currentPage = {currentPage}
-                setInfo = {setInfo}
-            />
-            )
-        }
-        else {
-            console.log(filterData)
-            return(
-                <PageNum
-                    fd = {true}
-                    setTest ={setTest}
-                    data ={filterData}
-                    setPage = {setPage}
-                    currentPage = {currentPage}
-                    setInfo = {setInfo}
-                />
-            )
-        }
+    const pageChange = (i) => {
+        setPagination({
+            ...pagination,
+            page: i
+        })
     }
 
     return(
         <div className="body">
             <div className="searchInputBody">
-                <input className="searchInput" placeholder="Поиск..." onChange={(e) => {setSearchItem(e.target.value)}}/>
+                <input 
+                    className="searchInput" 
+                    placeholder="Поиск..." 
+                    value={searchItem}
+                    onChange={searchChange}/>
             </div>
             <div className="main">
-            {result()}
+            {data.map(item => (<Content
+                key={item.id}
+                nameCam={item.namecam}
+                location={item.location}
+                latitude={item.latitude}
+                longitude={item.longitude}
+                camId={item.id}
+            />))}
             </div>
-            {resultQ()}
-        </div>
+            <p className="pAllPage">{pagination.page} | {pagination.totalPage}</p>
+            <div className="btnPagee">
+                <button className="btnPage" onClick={() => pageChange(pagination.page -1)} disabled={pagination.page == 1}>
+                    &lt;
+                </button>
+                <button className="btnPage" onClick={() => pageChange(pagination.page +1)} disabled={pagination.page >= pagination.totalPage}>
+                    &gt;
+                </button>
+            </div>
+            </div>
       
-        
+      
     )
 }

@@ -117,66 +117,52 @@ app.post('/camera/add', async (req, res) => {
     }
 })
 
-const dataF = await pool.query('SELECT * FROM cam')
+app.get('/camera/filtAndPag', async (req,res) => {
 
-app.get('/camera/filter/:searchItem', async (req,res) => {
-    const searchItem = req.params.searchItem
+    const page = parseInt(req.query.page) || 1
 
-    try{
-        const Filter = searchItem ?
-            dataF.rows.filter(dataF => 
-            `${dataF.namecam} ${dataF.location} ${dataF.latitude} ${dataF.longitude}`.toLowerCase().includes(searchItem.toLowerCase())
-            )
-            :
-            dataF
-        res.status(200).json({
-            filter: Filter
-        })
-    }
-    catch(err){
-        console.log(err)
-        res.status(500).json({
-            success: false
-        })
-    }
+    const limit = parseInt(req.query.limit) || 6
+
+    const offset = (page - 1) * limit
+
+    const searchQuery = req.query.search || ''
+
+    const searchFields = ['namecam', 'location', 'latitude', 'longitude']
+
+    let query = 'SELECT * FROM cam WHERE '
+
+    const searchConditions = searchFields.map(fields => `${fields}::text ILIKE $1`).join(' OR ')
+
+    query += `(${searchConditions})`
+
+    query += 'ORDER BY id ASC '
+
+    query += 'LIMIT $2 OFFSET $3'
+
+    const params = [`%${searchQuery}%`, limit, offset]
+
+    const {rows} = await pool.query(query, params)
+
+    const countQuery = 'SELECT COUNT(*) FROM cam WHERE ' + searchConditions
+
+    const {rows: countRows} = await pool.query(countQuery, [`%${searchQuery}%`])
+
+    const totalCount = parseInt(countRows[0].count)
+
+    const totalPage = Math.ceil(totalCount / limit)
+
+    res.status(200).json({
+      data: rows,
+      pagination: {
+        page,
+        limit,
+        totalItems: totalCount, totalPage,
+        hasNextPage: page < totalPage,
+        hasPrevPage: page > 1
+      }
+    });
 })
 
-app.get('/camera/pagAll', async (req, res) => {
-     try{
-        const allData = await pool.query('SELECT COUNT(*) FROM cam')  
-        let test = []
-
-        for(let i = 1; i <= allData.rows[0].count; i++){
-            test.push(i)
-        }
-        res.status(200).json({
-            allData: test
-        })
-    }
-    catch(err) {
-        console.log(err)
-        res.status(500).json({
-            success: false
-        })
-    }
-})
-
-app.get('/camera/pagination', async (req, res) => {
-    try{
-        const {firstElement, lastElement} = req.query
-        console.log(firstElement, lastElement)
-        const query = await pool.query('SELECT * FROM cam WHERE id >= $1 and id <= $2', [firstElement, lastElement])    
-        res.status(200).json({
-            data: query.rows,
-        })
-    }
-    catch(err) {
-        //console.log(err)
-        res.status(500).json({
-            success: false
-        })
-    }
-})
 
 app.get('/camera/:id', async (req,res) => {
     const id = req.params.id
