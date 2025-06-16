@@ -30,6 +30,7 @@ export function Pagination(props) {
                     totalItems: res.pagination.totalItems,
                     totalPage: res.pagination.totalPage
                 })
+                setLoading(false)
             })  
         } catch(err) {
             console.log(err)
@@ -62,6 +63,14 @@ export function Pagination(props) {
         })
     }
 
+    if(loading) {
+        return(
+            <div className="body">
+                <h1>Загрузка...</h1>
+            </div>
+        )
+    }
+
     return(
         <div className="body">
             <div className="searchInputBody">
@@ -72,6 +81,12 @@ export function Pagination(props) {
                     onChange={searchChange}/>
             </div>
             <div className="main">
+                <div className="nameTable">
+                    <p className="nameCam">Название камеры</p>
+                    <p className="location">Локация</p>
+                    <p className="latitude">Широта</p>
+                    <p className="longitude">Долгота</p>
+                </div>
             {data.map(item => (<Content
                 key={item.id}
                 nameCam={item.namecam}
@@ -81,7 +96,9 @@ export function Pagination(props) {
                 camId={item.id}
             />))}
             </div>
-            <p className="pAllPage">{pagination.page} | {pagination.totalPage}</p>
+            <div className="pAllPageDiv">
+                <p className="pAllPage">{pagination.page} | {pagination.totalPage}</p>
+            </div>
             <div className="btnPagee">
                 <button className="btnPage" onClick={() => pageChange(pagination.page -1)} disabled={pagination.page == 1}>
                     &lt;
