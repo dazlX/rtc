@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import './editPanel.css'
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
+import { apiService } from "../api";
 
 export function EditPanel() {
     const inputRef = useRef(null)
@@ -16,17 +17,19 @@ export function EditPanel() {
 
     const camId = useParams()
     useEffect(() => {
+        
+
         console.log(camId.id)
         const getInfo = async () => {
-            const res = await axios.get(`http://localhost:3001/camera/${camId.id}`) 
-            const query = res.data
-            setData(query)
+            const res = await apiService.editPanelGetInfo(camId.id)
+            setData(res)
         }
 
         getInfo()
     }, [])
 
     useEffect(() => {
+        console.log(data)
         try{
             inputRef.current.value = data[0].namecam
             inputRef1.current.value = data[0].location
@@ -53,17 +56,17 @@ export function EditPanel() {
         
         console.log(inputRef.current.value)
 
-        await axios.patch(`http://localhost:3001/camera/${camId.id}`, editInfo).then(res => {
-            if(res.status == 200) nav('/')
-        })
+        const res = await apiService.editPanelUpdateInfo(camId.id, editInfo)
+        if(res) nav('/')
+       
     }
 
     const del = async () => {
         try{
-            await axios.delete(`http://localhost:3001/camera/${camId.id}`).then(res => {
-                if(res.status == 200) nav('/')
+            const res = await  apiService.editPanelDeleteInfo(camId.id)
+                if(res) nav('/')
                 
-            })
+            
         }
         catch{
             console.log("Ошибка")
