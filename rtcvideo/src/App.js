@@ -7,6 +7,8 @@ import {AddCam} from './components/addCam/addCam.js'
 
 export function Main() {
   return(
+    <>
+    <title>CameraList</title>
     <BrowserRouter>
     <Routes>
       <Route path="/" element={<MainPage/>}/>
@@ -15,5 +17,6 @@ export function Main() {
       <Route path="/addCam" element={<AddCam/>}/>
     </Routes>
     </BrowserRouter>
+    </>
   )
 }

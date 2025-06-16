@@ -29,7 +29,6 @@ export function AddCam(getInfo) {
         if(result) {
             axios.post("http://localhost:3001/camera/add", {data}).then(res => {
                 if(res.status == 200){
-                    // getInfo()
                     inputRef.current.value = ''
                     inputRef1.current.value = ''
                     inputRef2.current.value = ''

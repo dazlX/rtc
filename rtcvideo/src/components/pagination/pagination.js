@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { Content } from "../content/content.js"
 import './pagination.css'
-import axios from "axios"
+import { apiService } from "../api.js"
 
 
 export function Pagination(props) {
@@ -15,22 +15,22 @@ export function Pagination(props) {
         totalPage: 1
     })
 
+
     const queryData = async () => {
         try{
             setLoading(true)
-
-            await axios.get('http://localhost:3001/camera/filtAndPag', {params: {
+            await apiService.paginationQueryData({params: {
                 search: searchItem,
                 page: pagination.page,
                 limit: pagination.limit
             }}).then(res => {
-                setData(res.data.data)
+                setData(res.data)
                 setPagination({
                     ...pagination,
-                    totalItems: res.data.pagination.totalItems,
-                    totalPage: res.data.pagination.totalPage
+                    totalItems: res.pagination.totalItems,
+                    totalPage: res.pagination.totalPage
                 })
-            })
+            })  
         } catch(err) {
             console.log(err)
         }

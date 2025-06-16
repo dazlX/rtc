@@ -1,8 +1,8 @@
 import react, { useEffect, useRef, useState } from "react"
 import Hls from "hls.js"
 import './main.css'
-import axios from 'axios'
 import { useParams } from "react-router-dom"
+import { apiService } from "../api"
 
 
 export const App = () => {
@@ -13,16 +13,17 @@ export const App = () => {
   
   
   const params = useParams()
-  console.log(params.id)
   useEffect(() => {
     const hls = new Hls() 
     const video = videoRef.current
 
     const Connect = async () => {
     
-    const req = await axios.get(`http://localhost:3001/id/${params.id}`).then(res => {
-      queryHls.current = res.data[0].camid
-    })
+    const response = await apiService.hlsConnectQuery(params.id)
+      if(response.success) {
+        queryHls.current = response.data[0].camid
+      }
+    
     
     hls.on(Hls.Events.MANIFEST_PARSED, (data) => {
       console.log("CONNECT OK")
