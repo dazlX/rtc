@@ -15,6 +15,25 @@ export const apiService ={
             console.log(error)
         }
     },
+    
+    editPanelUpdateInfo: async (id, info) => {
+        try {
+            await axios.patch(`${host}camera/${id}`, info)
+            return true
+      
+        } catch (error) {
+            console.log(error)
+        }
+    },
+
+    editPanelDeleteInfo: async (id) => {
+        try {
+            await axios.delete(`${host}camera/${id}`)
+            return true
+        } catch (error) {
+            console.log(error)
+        }
+    }, 
     hlsConnectQuery: async (id) => {
         try {
             const response = await axios.get(`${host}id/${id}`)
@@ -34,25 +53,6 @@ export const apiService ={
             return response.data
         } catch (error) {
             console.log(error)            
-        }
-    },
-    
-    editPanelUpdateInfo: async (id, info) => {
-        try {
-            await axios.patch(`${host}camera/${id}`, info)
-            return true
-      
-        } catch (error) {
-            console.log(error)
-        }
-    },
-
-    editPanelDeleteInfo: async (id) => {
-        try {
-            await axios.delete(`${host}camera/${id}`)
-            return true
-        } catch (error) {
-            console.log(error)
         }
     }
 }
